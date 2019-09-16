@@ -396,11 +396,10 @@ void render()
 	r2.bot = 195;
 	r2.left = 408;
 	r2.center = 0;
+    
+    ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
+
     ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
-	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
-
-
-
 
 
 
