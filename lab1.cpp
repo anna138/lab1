@@ -1,6 +1,6 @@
 //
 //modifi-d by: Anna Poon
-//date: 08-27-2019
+//date: 09/08/2019
 //
 //3350 Spring 2019 Lab-1
 //This program demonstrates the use of OpenGL and XWindows
@@ -39,6 +39,7 @@ using namespace std;
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include "fonts.h"
 
 const int MAX_PARTICLES = 200000;
 const float GRAVITY     = 0.1;
@@ -207,6 +208,9 @@ void init_opengl(void)
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+    //This is to allow fonts on the program
+    glEnable(GL_TEXTURE_2D);
+    initialize_fonts();
 }
 
 void makeParticle(int x, int y)
@@ -334,9 +338,19 @@ int randomHexColor(){
 
 void render()
 {
+    Rect r;
+	Rect r2;
 	glClear(GL_COLOR_BUFFER_BIT);
 	//Draw shapes...
 	//draw the box
+	r.bot = 20;
+	r.left = 10;
+	r.center = 0;
+	r2.bot = 195;
+	r2.left = 408;
+	r2.center = 0;
+    ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
+	
 	Shape *s;
 	int color1 =0, color2 = 0, color3 = 0; 
 	color1 = randomHexColor();
@@ -345,8 +359,10 @@ void render()
 	glColor3ub(color1,color2,color3);
 	//glColor3ub(90,140,90);
 	s = &g.box;
+	
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, s->center.z);
+	
 	float w, h;
 	w = s->width;
 	h = s->height;
@@ -357,6 +373,7 @@ void render()
 		glVertex2i( w, -h);
 	glEnd();
 	glPopMatrix();
+	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
 	//
 	//Draw particles here
 	for(int i = 0; i < g.n; i++){
