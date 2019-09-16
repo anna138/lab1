@@ -338,18 +338,7 @@ int randomHexColor(){
 
 void render()
 {
-    Rect r;
-	Rect r2;
 	glClear(GL_COLOR_BUFFER_BIT);
-	//Draw shapes...
-	//draw the box
-	r.bot = 20;
-	r.left = 10;
-	r.center = 0;
-	r2.bot = 195;
-	r2.left = 408;
-	r2.center = 0;
-    ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
 	
 	Shape *s;
 	int color1 =0, color2 = 0, color3 = 0; 
@@ -373,7 +362,6 @@ void render()
 		glVertex2i( w, -h);
 	glEnd();
 	glPopMatrix();
-	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
 	//
 	//Draw particles here
 	for(int i = 0; i < g.n; i++){
@@ -399,7 +387,17 @@ void render()
 	//
 	//Draw your 2D text here
 
+    Rect r;
+	Rect r2;
 
+	r.bot = 20;
+	r.left = 10;
+	r.center = 0;
+	r2.bot = 195;
+	r2.left = 408;
+	r2.center = 0;
+    ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
+	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
 
 
 
