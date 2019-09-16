@@ -1,5 +1,5 @@
 //
-//modifi-d by: Anna Poon
+//modified by: Anna Poon
 //date: 09/08/2019
 //
 //3350 Spring 2019 Lab-1
@@ -208,9 +208,9 @@ void init_opengl(void)
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
-    //This is to allow fonts on the program
-    glEnable(GL_TEXTURE_2D);
-    initialize_fonts();
+	//This is to allow fonts on the program
+	glEnable(GL_TEXTURE_2D);
+	initialize_fonts();
 }
 
 void makeParticle(int x, int y)
@@ -397,9 +397,6 @@ void render()
 	r2.center = 0;
 	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
 	ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
-
-
-
 
 }
 
