@@ -316,11 +316,9 @@ void movement()
 	    p->s.center.x += p->velocity.x;
 	    p->s.center.y += p->velocity.y;	
 	    p->velocity.y -= GRAVITY;
-	    //Check for collision with shapes...
-		Shape * s;
+	    Shape * s;
 	    for(int j = 0; j < SIZE; j++){
 			s = &g.box[j]; 
-		
 			if(p->s.center.y < s->center.y + s->height && 
 				p->s.center.y > s->center.y - s->height && 
 				p->s.center.x > s->center.x - s->width && 
@@ -344,7 +342,7 @@ int randomHexColor()
 {
 	int hex = 0;
 	hex = rand() % 900 + 100;
-    return hex;
+	return hex;
 }
 
 void render()
