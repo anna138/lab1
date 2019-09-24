@@ -41,10 +41,9 @@ using namespace std;
 #include <GL/glx.h>
 #include "fonts.h"
 
-const int MAX_PARTICLES = 2000000;
+const int MAX_PARTICLES = 200000;
 const float GRAVITY     = 0.1;
-const int SIZE = 5;
-int flag = 0;
+
 //some structures
 
 struct Vec {
@@ -65,7 +64,7 @@ struct Particle {
 class Global {
 public:
 	int xres, yres;
-	Shape box[SIZE];
+	Shape box;
 	Particle particle[MAX_PARTICLES];
 	int n;
 	Global();
@@ -122,16 +121,13 @@ int main()
 //-----------------------------------------------------------------------------
 Global::Global()
 {
-	xres = 500;
-	yres = 360;
+	xres = 800;
+	yres = 600;
 	//define a box shape
-	for (int i = 0; i < SIZE; i++) {
-		box[i].width = 80;
-		box[i].height = 10;
-		box[i].center.x = -140+(i*60);
-		box[i].center.y = 130-(i*60);
-
-	}
+	box.width = 100;
+	box.height = 10;
+	box.center.x = 120 + 5*65;
+	box.center.y = 500 - 5*60;
 	n = 0;
 }
 
@@ -209,8 +205,7 @@ void init_opengl(void)
 	glMatrixMode(GL_PROJECTION); glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 	//Set 2D mode (no perspective)
-	//glOrtho(left, right, bottom, top)
-	glOrtho(-g.xres/2, g.xres/2, -g.yres/2, g.yres/2, -1, 1);
+	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	//This is to allow fonts on the program
@@ -255,9 +250,8 @@ void check_mouse(XEvent *e)
 	if (e->type == ButtonPress) {
 		if (e->xbutton.button==1) {
 			//Left button was pressed.
-			int y = ((2*((float)e->xbutton.y/g.yres)-1)*-g.yres/2);
-			int x = ((2*((float)e->xbutton.x/g.xres)-1)*g.xres/2);
-			makeParticle(x, y);
+			int y = g.yres - e->xbutton.y;
+			makeParticle(e->xbutton.x, y);
 			return;
 		}
 		if (e->xbutton.button==3) {
@@ -271,10 +265,9 @@ void check_mouse(XEvent *e)
 			savex = e->xbutton.x;
 			savey = e->xbutton.y;
 			//Code placed here will execute whenever the mouse moves.
-			int y = ((2*((float)e->xbutton.y/g.yres)-1)*-g.yres/2);
-			int x = ((2*((float)e->xbutton.x/g.xres)-1)*g.xres/2);
+			int y = g.yres - e->xbutton.y;
 			for(int i = 0; i < 10; i++){
-				makeParticle(x, y);
+				makeParticle(e->xbutton.x, y);
 			}
 
 		}
@@ -316,121 +309,95 @@ void movement()
 	    p->s.center.x += p->velocity.x;
 	    p->s.center.y += p->velocity.y;	
 	    p->velocity.y -= GRAVITY;
-	    //Check for collision with shapes...
-		Shape * s;
-	    for(int j = 0; j < SIZE; j++){
-			s = &g.box[j]; 
-		
-			if(p->s.center.y < s->center.y + s->height && 
-				p->s.center.y > s->center.y - s->height && 
-				p->s.center.x > s->center.x - s->width && 
-				p->s.center.x < s->center.x + s->width){
-				p->velocity.y = -(p->velocity.y * 0.8);
-				p->velocity.x = (p->velocity.x*0.7 + 0.2);
-			}
-		}
-		//Check for off-screen
-		if (p->s.center.y < (-g.yres)/2) {
-			g.particle[i] = g.particle[g.n-1];
-			--g.n;
-			flag = flag^1;
-		}
-		
+	    //check for collision with shapes...
+	    Shape *s;
+	    s = &g.box; 
+	    if(p->s.center.y < s->center.y + s->height && 
+		    p->s.center.y > s->center.y - s->height && 
+		    p->s.center.x > s->center.x - s->width && 
+		    p->s.center.x < s->center.x + s->width){
+		//cout << "hits the object" << endl;
+		p->velocity.y = -(p->velocity.y * 0.9);
+	    }
+	    //check for off-screen
+	    if (p->s.center.y < 0.0) {
+		//cout << "off screen" << endl;
+		g.particle[i] = g.particle[g.n-1];
+		--g.n;
+	    }
 	}
 
 }
 
-int randomHexColor()
-{
+int randomHexColor(){
 	int hex = 0;
 	hex = rand() % 900 + 100;
-    return hex;
+	//cout << hex << endl;
+    	return hex;
 }
 
 void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	Shape * s;
-	float w, h;
+	Shape *s;
+	int color1 =0, color2 = 0, color3 = 0; 
+	color1 = randomHexColor();
+	color2 = randomHexColor();
+	color3 = randomHexColor();
+	glColor3ub(color1,color2,color3);
+	//glColor3ub(90,140,90);
+	s = &g.box;
 	
-	for (int i = 0; i < SIZE; i++) {
-		if (flag) {
-			/* Line below: changes the lighter shades of each individual color
-			glColor3ub(125+(i*85), 250+(i*85), 50+(i*85));*/
-			glColor3ub(255+(i*85), 120+(i*85), 135+(i*85));
-		} else {
-			glColor3ub(100+(i*85), 225+(i*85), 25+(i*85));
-		}
-		s = &g.box[i];
-		
-		glPushMatrix();
-		glTranslatef(s->center.x, s->center.y, s->center.z);
-		
-		w = s->width;
-		h = s->height;
-		glBegin(GL_QUADS);
-		glVertex2i(-w , -h);
-		glVertex2i(-w , h);
-		glVertex2i( w , h);
-		glVertex2i( w , -h);
-
-		glEnd();
-		glPopMatrix();
-	}
+	glPushMatrix();
+	glTranslatef(s->center.x, s->center.y, s->center.z);
+	
+	float w, h;
+	w = s->width;
+	h = s->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w, -h);
+		glVertex2i(-w,  h);
+		glVertex2i( w,  h);
+		glVertex2i( w, -h);
+	glEnd();
+	glPopMatrix();
 	//
 	//Draw particles here
-	for (int i = 0; i < g.n; i++) {
+	for(int i = 0; i < g.n; i++){
+		//There is at least one particle to draw.
 		glPushMatrix();
-		w = h = rand()%3;
-		if (i%3 == 0) {
-			//All Diamonds have a Random Shade of Blue
-			glColor3ub(0+(i%100),90+(i%100),255);
-			Vec *c = &g.particle[i].s.center;
-			glBegin(GL_POLYGON);
-			glVertex2i(c->x-w, c->y-h);
-			glVertex2i(c->x-w, c->y+2.5*h);
-			glVertex2i(c->x+w, c->y+h);
-			glVertex2i(c->x+w, c->y-2.5*h);
-		} else if (i%3== 1) {
-			//All Squares have a Random Shade of Green
-			glColor3ub(11+(i%150),255, 50+(i%150));
-			Vec *c = &g.particle[i].s.center;
-			glBegin(GL_QUADS);
+		
+		color1 = randomHexColor();
+		color2 = randomHexColor();
+		color3 = randomHexColor();
+		glColor3ub(color1,color2,color3);
+
+		//glColor3ub(150,160,220);
+		Vec *c = &g.particle[i].s.center;
+		w = h = 2;
+		glBegin(GL_QUADS);
 			glVertex2i(c->x-w, c->y-h);
 			glVertex2i(c->x-w, c->y+h);
 			glVertex2i(c->x+w, c->y+h);
 			glVertex2i(c->x+w, c->y-h);
-		} else {
-			//All Triangles have a Random Shade of Red
-			glColor3ub(255,30+(i%150),22+(i%150));
-			Vec *c = &g.particle[i].s.center;
-			glBegin(GL_TRIANGLE_STRIP);
-			glVertex2i(c->x-w, c->y-h);
-			glVertex2i(c->x-w, c->y+h);
-			glVertex2i(c->x+w, c->y+h);
-		}
 		glEnd();
 		glPopMatrix();
 	}
 	//
 	//Draw your 2D text here
-	Rect * r = new Rect[SIZE];
-	string model[SIZE] = {"Requirements", "     Design", "Implementation", "    Testing", " Maintenance"};
-	
-	for (int i = 0; i < SIZE; i++) {
-		r[i].left = -175+(i*60);
-		r[i].bot = 125-(i*60);
-		r[i].center = 0;
-		ggprint8b(&r[i], 16, 0x00ffffff, model[i].c_str());
-	}
-	
+	Rect r;
 	Rect r2;
-	r2.bot = -150;
+
+	r.bot = 20;
+	r.left = 10;
+	r.center = 0;
+	r2.bot = 195;
+	r2.left = 408;
 	r2.center = 0;
-	r2.left = -220;
-	ggprint8b(&r2, 16, 0x00ffffff, "It's Funnnfetti!");
-	
+	ggprint8b(&r2, 16, 0x00ffffff, "Requirements");
+	ggprint8b(&r, 16, 0x00ff0000, "3350 - Waterfall Method");
+
 }
 
 
