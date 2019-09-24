@@ -421,14 +421,7 @@ void render()
 		r[i].bot = 125-(i*60);
 		r[i].center = 0;
 		ggprint8b(&r[i], 16, 0x00ffffff, model[i].c_str());
-	}
-	
-	Rect r2;
-	r2.bot = -150;
-	r2.center = 0;
-	r2.left = -220;
-	ggprint8b(&r2, 16, 0x00ffffff, "It's Funnnfetti!");
-	
+	}	
 }
 
 
